@@ -13,18 +13,13 @@ const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
 
 const DOMAIN_NAME_EXAMPLE = "truora.com"
 
-type server struct {
-	Host     string `json:"host"`
-	Protocol string `json:"protocol"`
-}
-
 func main() {
 	//router := chi.NewRouter()
-
 	downloadJSON()
 }
 
 func downloadJSON() {
+
 	spaceClient := http.Client{
 		Timeout: time.Second * 2,
 	}
@@ -49,7 +44,7 @@ func downloadJSON() {
 		log.Fatal(readErr)
 	}
 
-	domain1 := Domain{}
+	domain1 := domainApi{}
 
 	jsonErr := json.Unmarshal(body, &domain1)
 
@@ -57,13 +52,53 @@ func downloadJSON() {
 		log.Fatal(jsonErr)
 	}
 
-	fmt.Println(domain1.Host)
+	if len(domain1.Erros) != 0 {
+		fmt.Println("Server is Down")
+	} else {
+		fmt.Println(domain1.Endpoints)
+	}
 
 }
 
 func makeURL() string {
 	return API_DOMAINS_URL + DOMAIN_NAME_EXAMPLE
 }
+
+type domainApi struct {
+	Host      string      `json:"host"`
+	Endpoints []serverApi `json:"endpoints"`
+	Erros     []errorsApi `json:"errors"`
+}
+
+type serverApi struct {
+	IpAddress string `json:"ipAddress"`
+	Grade     string `json:"grade"`
+}
+
+type errorsApi struct {
+	Message string `json:"message"`
+}
+
+/*
+func getJSON2(url string, result interface{}) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("cannot fetch URL %q: %v", url, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected http GET status: %s", resp.Status)
+	}
+	// We could check the resulting content type
+	// here if desired.
+	err := json.NewDecoder(resp.Body).Decode(result)
+	if err != nil {
+		return fmt.Errorf("cannot decode JSON: %v", err)
+	}
+	return nil
+}
+
+*/
 
 //var domains []Domain
 
@@ -96,10 +131,6 @@ func main() {
 
 }
 */
-
-func SearchDomain(w http.ResponseWriter, r *http.Request) {
-
-}
 
 /*
 func holaraiz(w http.ResponseWriter, r *http.Request) {
