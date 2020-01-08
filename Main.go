@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/camilaleniss/api-rest-go/model"
 )
 
 const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
@@ -34,7 +36,7 @@ func downloadJSON() {
 		Timeout: time.Second * 2,
 	}
 
-	url := makeURL()
+	url := makeURL(DOMAIN_NAME_EXAMPLE)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 
@@ -54,7 +56,7 @@ func downloadJSON() {
 		log.Fatal(readErr)
 	}
 
-	domain1 := domainApi{}
+	domain1 := model.DomainApi{}
 
 	jsonErr := json.Unmarshal(body, &domain1)
 
@@ -68,25 +70,20 @@ func downloadJSON() {
 		fmt.Println(domain1.Endpoints)
 	}
 
+	fmt.Println("---Who Is Info---")
+	makeWhoIs(domain1)
 }
 
-func makeURL() string {
-	return API_DOMAINS_URL + DOMAIN_NAME_EXAMPLE
+func makeWhoIs(domain model.DomainApi) {
+	for i := 0; i < len(domain.Endpoints); i++ {
+		fmt.Println("----------------SERVER NUMERO --------------")
+
+		fmt.Println(model.WhoisServerAttributes(domain.Endpoints[i]))
+	}
 }
 
-type domainApi struct {
-	Host      string      `json:"host"`
-	Endpoints []serverApi `json:"endpoints"`
-	Erros     []errorsApi `json:"errors"`
-}
-
-type serverApi struct {
-	IpAddress string `json:"ipAddress"`
-	Grade     string `json:"grade"`
-}
-
-type errorsApi struct {
-	Message string `json:"message"`
+func makeURL(domain string) string {
+	return API_DOMAINS_URL + domain
 }
 
 /*
