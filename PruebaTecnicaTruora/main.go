@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -15,7 +16,35 @@ const DOMAIN_NAME_EXAMPLE = "truora.com"
 
 func main() {
 	//router := chi.NewRouter()
-	downloadJSON()
+	//downloadJSON()
+
+	db := getConnection()
+
+	if _, err := db.Exec(
+		`INSERT INTO domain (host, ssl_grade, ssl_previous_grade) 
+		VALUES ('truora.com', 'A', 'A');`); err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func getConnection() *sql.DB {
+	/*dataBase, err := sql.Open("postgres", "postgresql://root@localhost:26257/domains?sslmode=disable")
+	if err != nil {
+		log.Fatal("error connecting to the database: ", err)
+	}
+	return dataBase*/
+	dbConnStr := "user=maxroach dbname=domains host=localhost port=26257 sslmode=disable"
+
+	db, err := sql.Open("postgres", dbConnStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	return db
+
 }
 
 func downloadJSON() {
