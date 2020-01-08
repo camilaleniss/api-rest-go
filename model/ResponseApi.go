@@ -2,9 +2,10 @@ package model
 
 import (
 	"log"
+	_ "strconv"
+	"strings"
 
 	"github.com/likexian/whois-go"
-	_ "github.com/likexian/whois-go"
 	//"github.com/domainr/whois"
 )
 
@@ -23,24 +24,31 @@ type ErrorsApi struct {
 	Message string `json:"message"`
 }
 
-func WhoisServerAttributes(server ServerApi) string {
+func WhoisServerAttributes(server ServerApi) (string, string) {
 
 	ip := server.IpAddress
 	result, err := whois.Whois(ip)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return result
 
-	/*
-		request, err := whois.NewRequest(ip)
-		if err != nil {
-			log.Fatal(err)
-		}
-		response, err := whois.DefaultClient.Fetch(request)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return response.String()
-	*/
+	owner, country := splitWhois(result)
+
+	return owner, country
+
+}
+
+func splitWhois(response string) (string, string) {
+	responses1 := (strings.Split(response, "\n"))
+
+	lineOwner := responses1[41]
+	lineCountry := responses1[47]
+
+	owner := strings.Split(lineOwner, ":")[1]
+	country := strings.Split(lineCountry, ":")[1]
+
+	serverOwner := strings.Trim(owner, " ")
+	serverCountry := strings.Trim(country, " ")
+
+	return serverOwner, serverCountry
 }

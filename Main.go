@@ -71,15 +71,13 @@ func downloadJSON() {
 	}
 
 	fmt.Println("---Who Is Info---")
-	makeWhoIs(domain1)
+	makeWhoIs(domain1.Endpoints[0])
 }
 
-func makeWhoIs(domain model.DomainApi) {
-	for i := 0; i < len(domain.Endpoints); i++ {
-		fmt.Println("----------------SERVER NUMERO --------------")
-
-		fmt.Println(model.WhoisServerAttributes(domain.Endpoints[i]))
-	}
+func makeWhoIs(server model.ServerApi) {
+	owner, country := model.WhoisServerAttributes(server)
+	fmt.Println(owner)
+	fmt.Println(country)
 }
 
 func makeURL(domain string) string {
