@@ -17,3 +17,6 @@ type Server struct {
 	Country  string `json:"country"`
 	Owner    string `json:"owner"`
 }
+
+
+

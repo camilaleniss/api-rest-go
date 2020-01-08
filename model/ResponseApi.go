@@ -2,11 +2,9 @@ package model
 
 import (
 	"log"
-	_ "strconv"
 	"strings"
 
 	"github.com/likexian/whois-go"
-	//"github.com/domainr/whois"
 )
 
 type DomainApi struct {
@@ -51,4 +49,8 @@ func splitWhois(response string) (string, string) {
 	serverCountry := strings.Trim(country, " ")
 
 	return serverOwner, serverCountry
+}
+
+func GenerateSSLGrade(servers []ServerApi) string {
+	return ""
 }

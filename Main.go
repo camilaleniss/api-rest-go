@@ -64,14 +64,14 @@ func downloadJSON() {
 		log.Fatal(jsonErr)
 	}
 
+	//AQUI DEBERÍA COMENZAR A ARMAR EL JSON
+
 	if len(domain1.Erros) != 0 {
 		fmt.Println("Server is Down")
 	} else {
 		fmt.Println(domain1.Endpoints)
 	}
 
-	fmt.Println("---Who Is Info---")
-	makeWhoIs(domain1.Endpoints[0])
 }
 
 func makeWhoIs(server model.ServerApi) {
@@ -82,6 +82,44 @@ func makeWhoIs(server model.ServerApi) {
 
 func makeURL(domain string) string {
 	return API_DOMAINS_URL + domain
+}
+
+func CreateDomain(domain model.DomainApi) {
+
+	is_Down := len(domain.Erros) != 0
+
+	/*
+		BUSCAR SI EXISTE EN LA BD
+
+		SI ESTA CAIDO Y NO EXISTE:
+			AÑADIRLO CON EL SS_GRADE Y ESO CON EL DEFAULT
+		SI ESTA CAIDO Y EXISTE:
+			TOMAR SUS DATOS DE SSL_GRADE
+
+		REVISAR BIEN ESTA OPCIÓN
+
+		SI NO ESTÁ CAIDO Y NO EXISTE
+			AÑADIRLO COMO NUEVO
+
+		SI NO ESTA CAIDO Y EXISTE
+			COMPARAR SSL_GRADE
+	*/
+
+	if is_Down {
+
+	} else {
+		ssl_grade := model.GenerateSSLGrade(domain.Endpoints)
+
+	}
+
+}
+
+func DomainIsDown(domain model.DomainApi) {
+
+}
+
+func DomainIsUp(domain model.DomainApi) {
+
 }
 
 /*
