@@ -1,8 +1,10 @@
-package main
+package connection
 
 import (
 	"database/sql"
 	"log"
+
+	_ "github.com/lib/pq"
 )
 
 func GetConnection() *sql.DB {
