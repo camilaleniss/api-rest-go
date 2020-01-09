@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/camilaleniss/api-rest-go/connection"
 	"github.com/camilaleniss/api-rest-go/model"
 )
 
@@ -17,7 +18,7 @@ const DOMAIN_NAME_EXAMPLE = "truora.com"
 
 func main() {
 	//router := chi.NewRouter()
-	downloadJSON()
+	//downloadJSON()
 
 	/*
 		db := connection.GetConnection()
@@ -28,6 +29,7 @@ func main() {
 			log.Fatal(err)
 		}
 	*/
+	connection.CreateDomain("medium.com", "A", "A")
 }
 
 func downloadJSON() {
@@ -84,7 +86,7 @@ func makeURL(domain string) string {
 	return API_DOMAINS_URL + domain
 }
 
-func CreateDomain(domain model.DomainApi) {
+func CreateDomain(domain model.DomainApi) bool {
 
 	is_Down := len(domain.Erros) != 0
 
@@ -109,9 +111,11 @@ func CreateDomain(domain model.DomainApi) {
 
 	} else {
 		ssl_grade := model.GenerateSSLGrade(domain.Endpoints)
+		fmt.Println(ssl_grade)
 
 	}
 
+	return true
 }
 
 func DomainIsDown(domain model.DomainApi) {
@@ -120,6 +124,18 @@ func DomainIsDown(domain model.DomainApi) {
 
 func DomainIsUp(domain model.DomainApi) {
 
+}
+
+func PruebaSSL_Grade() {
+	server1 := model.ServerApi{"1.2.3.4.5", "B+"}
+	server2 := model.ServerApi{"1.2.3.4.6", "A"}
+	server3 := model.ServerApi{"1.2.3.4.4", "B"}
+
+	server := []model.ServerApi{server1, server2, server3}
+
+	respuesta := model.GenerateSSLGrade(server)
+
+	fmt.Println(respuesta)
 }
 
 /*
