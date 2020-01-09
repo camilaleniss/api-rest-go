@@ -39,11 +39,10 @@ func (d *DomainHnd) GetByID(w http.ResponseWriter, r *http.Request) {
 	//ESTO DEBERÍA BUSCARLO EN EL API
 	payload := getJsonDomain(d, id)
 
-	/*
-		if payload == nil {
-			respondWithError(w, http.StatusNoContent, "Content not found")
-		}
-	*/
+	if payload.IsDown {
+		respondWithError(w, http.StatusNoContent, "Content not found")
+	}
+
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
@@ -105,6 +104,8 @@ func getJsonDomain(d *DomainHnd, host string) model.Domain {
 		ssl_previous_grade = ssl_grade_obtained
 		d.repo.CreateDomain(host, ssl_grade_obtained, ssl_previous_grade)
 	}
+
+	d.repo.UpdateDomain(host, ssl_grade_obtained, ssl_previous_grade)
 
 	domain := createDomain(servers_api, ssl_grade_obtained, ssl_previous_grade, logo, title, is_Down)
 
@@ -208,7 +209,7 @@ func compareOneHourBefore(servers_api []model.ServerApi, ssl_grade_bd string, la
 	today := time.Now()
 	comparator := last_search.Add(1 * time.Hour)
 
-	if today.Before(comparator) {
+	if today.After(comparator) {
 
 		return ssl_grade_bd, ssl_grade_bd
 	} else {

@@ -46,14 +46,22 @@ func WhoisServerAttributes(server ServerApi) (string, string) {
 func splitWhois(response string) (string, string) {
 	responses1 := (strings.Split(response, "\n"))
 
+	if len(responses1) < LINE_OWNER {
+		return "", ""
+	}
+
 	lineOwner := responses1[LINE_OWNER]
 	lineCountry := responses1[LINE_COUNTRY]
 
-	owner := strings.Split(lineOwner, ":")[1]
-	country := strings.Split(lineCountry, ":")[1]
+	owner := strings.Split(lineOwner, ":")
+	country := strings.Split(lineCountry, ":")
 
-	serverOwner := strings.Trim(owner, " ")
-	serverCountry := strings.Trim(country, " ")
+	if len(owner) < 2 || len(country) < 2 {
+		return "", ""
+	}
+
+	serverOwner := strings.Trim(owner[1], " ")
+	serverCountry := strings.Trim(country[1], " ")
 
 	return serverOwner, serverCountry
 }
@@ -64,6 +72,7 @@ The SSL grade of a domain is the minor SSL grade of the servers
 */
 
 func GenerateSSLGrade(servers []ServerApi) string {
+
 	if len(servers) < 1 {
 		return SSL_DEFAULT
 	}
@@ -71,9 +80,14 @@ func GenerateSSLGrade(servers []ServerApi) string {
 	minor := servers[0].Grade
 
 	for i := 1; i < len(servers); i++ {
-		grade := strings.Split(servers[i].Grade, "")[0]
+		grades := strings.Split(servers[i].Grade, "")
+		if len(grades) <= 0 {
+			return SSL_DEFAULT
+		}
+		grade := grades[0]
+
 		if existsInSSL(grade) {
-			if grade > minor {
+			if grade >= minor {
 				minor = grade
 			}
 		}
