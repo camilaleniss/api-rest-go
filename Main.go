@@ -31,17 +31,20 @@ func main() {
 	*/
 
 	/*
-		domain1 := connection.SearchDomain("medium.com")
+			domain1 := connection.SearchDomain("medium.com")
 
-		fmt.Println(domain1.Host)
-		fmt.Println(domain1.Ssl_grade)
-		fmt.Println(domain1.Ssl_previous_grade)
-		fmt.Println(domain1.Last_search)*/
+			fmt.Println(domain1.Host)
+			fmt.Println(domain1.Ssl_grade)
+			fmt.Println(domain1.Ssl_previous_grade)
+			fmt.Println(domain1.Last_search)
 
-	domains := connection.SearchDomains()
-	for i := 0; i < len(domains); i++ {
-		fmt.Println(domains[i].Host)
-	}
+		domains := connection.SearchDomains()
+		for i := 0; i < len(domains); i++ {
+			fmt.Println(domains[i].Host)
+		}
+	*/
+
+	connection.UpdateDomain("truora.com", "B", "A")
 
 }
 

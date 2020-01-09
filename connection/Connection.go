@@ -81,3 +81,13 @@ func SearchDomains() []DomainBD {
 
 	return hosts
 }
+
+func UpdateDomain(host string, new_ssl_grade string, new_previous_grade string) error {
+	db := GetConnection()
+	if _, err := db.Exec(
+		"UPDATE domain SET ssl_grade =  $1, ssl_previous_grade = $2 , last_search = NOW() WHERE host = $3", new_ssl_grade,
+		new_previous_grade, host); err != nil {
+		return err
+	}
+	return nil
+}
