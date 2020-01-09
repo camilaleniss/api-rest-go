@@ -1,9 +1,9 @@
 package model
 
 type Domain struct {
-	Host             string   `json:"host"`
+	//Host             string   `json:"host"`
 	Servers          []Server `json:"servers"`
-	ServersChanged   string   `json:"servers_changed"`
+	ServersChanged   bool     `json:"servers_changed"`
 	SslGrade         string   `json:"ssl_grade"`
 	PreviousSslGrade string   `json:"previous_ssl_grade"`
 	Logo             string   `json:"logo"`
@@ -17,6 +17,3 @@ type Server struct {
 	Country  string `json:"country"`
 	Owner    string `json:"owner"`
 }
-
-
-

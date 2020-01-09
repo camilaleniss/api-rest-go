@@ -84,3 +84,11 @@ func (s *sqlDomainRepo) UpdateDomain(host string, new_ssl_grade string, new_prev
 	}
 	return nil
 }
+
+func (s *sqlDomainRepo) UpdateDomainVisit(host string) error {
+	if _, err := s.Conn.Exec(
+		"UPDATE domain SET  last_search = NOW() WHERE host = $1", host); err != nil {
+		return err
+	}
+	return nil
+}

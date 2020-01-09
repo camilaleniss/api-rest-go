@@ -9,4 +9,5 @@ type DomainRepo interface {
 	SearchDomain(hostquery string) (connection.DomainBD, error)
 	SearchDomains() []connection.DomainBD
 	UpdateDomain(host string, new_ssl_grade string, new_previous_grade string) error
+	UpdateDomainVisit(host string) error
 }

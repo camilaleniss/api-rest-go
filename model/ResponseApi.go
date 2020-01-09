@@ -64,6 +64,9 @@ The SSL grade of a domain is the minor SSL grade of the servers
 */
 
 func GenerateSSLGrade(servers []ServerApi) string {
+	if len(servers) < 1 {
+		return SSL_DEFAULT
+	}
 
 	minor := servers[0].Grade
 
