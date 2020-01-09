@@ -29,7 +29,20 @@ func main() {
 			log.Fatal(err)
 		}
 	*/
-	connection.CreateDomain("medium.com", "A", "A")
+
+	/*
+		domain1 := connection.SearchDomain("medium.com")
+
+		fmt.Println(domain1.Host)
+		fmt.Println(domain1.Ssl_grade)
+		fmt.Println(domain1.Ssl_previous_grade)
+		fmt.Println(domain1.Last_search)*/
+
+	domains := connection.SearchDomains()
+	for i := 0; i < len(domains); i++ {
+		fmt.Println(domains[i].Host)
+	}
+
 }
 
 func downloadJSON() {
