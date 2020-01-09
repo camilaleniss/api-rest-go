@@ -9,7 +9,10 @@ import (
 	"time"
 
 	"github.com/camilaleniss/api-rest-go/connection"
+	dh "github.com/camilaleniss/api-rest-go/handler/http"
 	"github.com/camilaleniss/api-rest-go/model"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 )
 
 const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
@@ -17,35 +20,31 @@ const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
 const DOMAIN_NAME_EXAMPLE = "truora.com"
 
 func main() {
-	//router := chi.NewRouter()
-	//downloadJSON()
+	connection, err := connection.GetConnection()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	/*
-		db := connection.GetConnection()
+	r := chi.NewRouter()
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Logger)
 
-		if _, err := db.Exec(
-			`INSERT INTO domain (host, ssl_grade, ssl_previous_grade)
-			VALUES ('truora.com', 'A', 'A');`); err != nil {
-			log.Fatal(err)
-		}
-	*/
+	dHandler := dh.NewDomainHandler(connection)
+	r.Route("/", func(rt chi.Router) {
+		rt.Mount("/api", domainRouter(dHandler))
+	})
 
-	/*
-			domain1 := connection.SearchDomain("medium.com")
+	fmt.Println("Server listen at :8080")
+	http.ListenAndServe(":8080", r)
 
-			fmt.Println(domain1.Host)
-			fmt.Println(domain1.Ssl_grade)
-			fmt.Println(domain1.Ssl_previous_grade)
-			fmt.Println(domain1.Last_search)
+}
 
-		domains := connection.SearchDomains()
-		for i := 0; i < len(domains); i++ {
-			fmt.Println(domains[i].Host)
-		}
-	*/
-
-	connection.UpdateDomain("truora.com", "B", "A")
-
+func domainRouter(pHandler *dh.DomainHnd) http.Handler {
+	r := chi.NewRouter()
+	r.Get("/", pHandler.InitApi)
+	r.Get("/{id}", pHandler.GetByID)
+	r.Get("/domains", pHandler.Fetch)
+	return r
 }
 
 func downloadJSON() {

@@ -1,52 +1,40 @@
-package connection
+package domain
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
+	"github.com/camilaleniss/api-rest-go/connection"
+	dRepo "github.com/camilaleniss/api-rest-go/repository"
 	_ "github.com/lib/pq"
 )
 
-type DB struct {
-	Cock *sql.DB
+// NewSQLPostRepo retunrs implement of post repository interface
+func NewSQLDomainRepo(Conn *sql.DB) dRepo.DomainRepo {
+	return &sqlDomainRepo{
+		Conn: Conn,
+	}
 }
 
-var dbConn = &DB{}
-
-type DomainBD struct {
-	Host               string
-	Ssl_grade          string
-	Ssl_previous_grade string
-	Last_search        time.Time
+type sqlDomainRepo struct {
+	Conn *sql.DB
 }
 
-func GetConnection() (*DB, error) {
-	dataBase, err := sql.Open("postgres", "postgresql://root@localhost:26257/domains?sslmode=disable")
-	dbConn.Cock = dataBase
-
-	/*
-		if err != nil {
-			log.Fatal("error connecting to the database: ", err)
-		}
-	*/
-	return dbConn, err
-}
-
-/*
-func CreateDomain(db *sql.DB, host string, ssl_grade string, ssl_previous_grade string) {
+func (s *sqlDomainRepo) CreateDomain(host string, ssl_grade string, ssl_previous_grade string) {
 	values := "'" + host + "','" + ssl_grade + "','" + ssl_previous_grade + "', "
-	if _, err := db.Exec(
+	if _, err := s.Conn.Exec(
 		"INSERT INTO domain (host, ssl_grade, ssl_previous_grade, last_search) VALUES (" + values + " NOW())"); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func SearchDomain(db *sql.DB, hostquery string) DomainBD {
+func (s *sqlDomainRepo) SearchDomain(hostquery string) (connection.DomainBD, error) {
 
 	query := "SELECT host, ssl_grade, ssl_previous_grade, last_search FROM domain WHERE host='" + hostquery + "';"
-	rows, err := db.Query(query)
+	rows, err := s.Conn.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		return connection.DomainBD{}, err
 	}
 
 	defer rows.Close()
@@ -58,21 +46,21 @@ func SearchDomain(db *sql.DB, hostquery string) DomainBD {
 			log.Fatal(err)
 		}
 
-		return DomainBD{host, ssl_grade, ssl_previous_grade, last_search}
+		return connection.DomainBD{host, ssl_grade, ssl_previous_grade, last_search}, err
 	}
 
-	return DomainBD{}
+	return connection.DomainBD{}, err
 }
 
-func SearchDomains(db *sql.DB) []DomainBD {
+func (s *sqlDomainRepo) SearchDomains() []connection.DomainBD {
 	query := "SELECT host FROM domain ORDER BY last_search DESC;"
-	rows, err := db.Query(query)
+	rows, err := s.Conn.Query(query)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer rows.Close()
-	var hosts []DomainBD
+	var hosts []connection.DomainBD
 	var host string
 
 	for rows.Next() {
@@ -80,7 +68,7 @@ func SearchDomains(db *sql.DB) []DomainBD {
 			log.Fatal(err)
 		}
 
-		domain := DomainBD{}
+		domain := connection.DomainBD{}
 		domain.Host = host
 		hosts = append(hosts, domain)
 	}
@@ -88,12 +76,11 @@ func SearchDomains(db *sql.DB) []DomainBD {
 	return hosts
 }
 
-func UpdateDomain(db *sql.DB, host string, new_ssl_grade string, new_previous_grade string) error {
-	if _, err := db.Exec(
+func (s *sqlDomainRepo) UpdateDomain(host string, new_ssl_grade string, new_previous_grade string) error {
+	if _, err := s.Conn.Exec(
 		"UPDATE domain SET ssl_grade =  $1, ssl_previous_grade = $2 , last_search = NOW() WHERE host = $3", new_ssl_grade,
 		new_previous_grade, host); err != nil {
 		return err
 	}
 	return nil
 }
-*/
