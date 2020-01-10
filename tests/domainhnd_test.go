@@ -74,3 +74,10 @@ func TestCompareOneHourBefore(t *testing.T) {
 	}
 
 }
+
+func TestGetHTML(t *testing.T) {
+	url := "https://www.truora.com/"
+	title2, icon := handler.GetHTMLInfo(url)
+	fmt.Println(title2)
+	fmt.Println(icon)
+}

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/badoux/goscraper"
 	"github.com/camilaleniss/api-rest-go/connection"
 	"github.com/camilaleniss/api-rest-go/model"
 	repository "github.com/camilaleniss/api-rest-go/repository"
@@ -17,6 +18,10 @@ import (
 
 //This API gives us information about the domain, its servers and the ssl grade of each server
 const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
+
+const TIMES_REQUEST = 4
+
+const PREFIX_URL = "http://www."
 
 func NewDomainHandler(db *connection.DB) *DomainHnd {
 	return &DomainHnd{
@@ -81,6 +86,7 @@ func getJsonDomain(d *DomainHnd, host string) model.Domain {
 		servers_api = []model.ServerApi{}
 	} else {
 		servers_api = domain_api.Endpoints
+		title, logo = GetHTMLInfo(PREFIX_URL + host)
 	}
 
 	if exists {
@@ -151,7 +157,12 @@ func downloadJSONApi(domainurl string) model.DomainApi {
 
 	url := makeURL(domainurl)
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	var req *http.Request
+	var err error
+
+	for i := 0; i < TIMES_REQUEST; i++ {
+		req, err = http.NewRequest(http.MethodGet, url, nil)
+	}
 
 	if err != nil {
 		log.Fatal(err)
@@ -207,4 +218,13 @@ func CompareOneHourBefore(servers_api []model.ServerApi, ssl_grade_bd string, la
 	} else {
 		return model.GenerateSSLGrade(servers_api), ssl_grade_bd
 	}
+}
+
+func GetHTMLInfo(url string) (string, string) {
+	s, err := goscraper.Scrape(url, TIMES_REQUEST)
+	if err != nil {
+		fmt.Println(err)
+		return "", ""
+	}
+	return s.Preview.Title, s.Preview.Icon
 }
