@@ -6,7 +6,8 @@ import (
 
 	"github.com/camilaleniss/api-rest-go/connection"
 	dh "github.com/camilaleniss/api-rest-go/handler/http"
-	"github.com/camilaleniss/api-rest-go/model"
+
+	//"github.com/camilaleniss/api-rest-go/model"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -37,16 +38,4 @@ func domainRouter(pHandler *dh.DomainHnd) http.Handler {
 	r.Get("/{domainId}", pHandler.GetByID)
 	r.Get("/domains", pHandler.Fetch)
 	return r
-}
-
-func PruebaSSL_Grade() {
-	server1 := model.ServerApi{"1.2.3.4.5", "B+"}
-	server2 := model.ServerApi{"1.2.3.4.6", "A"}
-	server3 := model.ServerApi{"1.2.3.4.4", "B"}
-
-	server := []model.ServerApi{server1, server2, server3}
-
-	respuesta := model.GenerateSSLGrade(server)
-
-	fmt.Println(respuesta)
 }

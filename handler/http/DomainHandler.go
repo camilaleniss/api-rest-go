@@ -36,7 +36,6 @@ func (d *DomainHnd) InitApi(w http.ResponseWriter, r *http.Request) {
 func (d *DomainHnd) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "domainId")
 
-	//ESTO DEBERÍA BUSCARLO EN EL API
 	payload := getJsonDomain(d, id)
 
 	if payload.IsDown {
@@ -49,11 +48,6 @@ func (d *DomainHnd) GetByID(w http.ResponseWriter, r *http.Request) {
 //Search all the domains
 func (d *DomainHnd) Fetch(w http.ResponseWriter, r *http.Request) {
 	payload := d.repo.SearchDomains()
-
-	for i := 0; i < len(payload); i++ {
-		fmt.Println(payload[i].Host)
-	}
-
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
@@ -96,7 +90,7 @@ func getJsonDomain(d *DomainHnd, host string) model.Domain {
 			ssl_grade_obtained = ssl_grade_bd
 			ssl_previous_grade = domain_bd.Ssl_previous_grade
 		} else {
-			ssl_grade_obtained, ssl_previous_grade = compareOneHourBefore(servers_api, ssl_grade_bd, last_search)
+			ssl_grade_obtained, ssl_previous_grade = CompareOneHourBefore(servers_api, ssl_grade_bd, last_search)
 		}
 
 	} else {
@@ -205,12 +199,10 @@ func searchDomainDB(d *DomainHnd, host string) (connection.DomainBD, error) {
 	return payload, err
 }
 
-func compareOneHourBefore(servers_api []model.ServerApi, ssl_grade_bd string, last_search time.Time) (string, string) {
+func CompareOneHourBefore(servers_api []model.ServerApi, ssl_grade_bd string, last_search time.Time) (string, string) {
 	today := time.Now()
 	comparator := last_search.Add(1 * time.Hour)
-
-	if today.After(comparator) {
-
+	if today.Before(comparator) {
 		return ssl_grade_bd, ssl_grade_bd
 	} else {
 		return model.GenerateSSLGrade(servers_api), ssl_grade_bd

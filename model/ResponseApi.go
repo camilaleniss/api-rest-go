@@ -30,40 +30,57 @@ type ErrorsApi struct {
 }
 
 func WhoisServerAttributes(server ServerApi) (string, string) {
-
 	ip := server.IpAddress
 	result, err := whois.Whois(ip)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	owner, country := splitWhois(result)
-
 	return owner, country
 
 }
 
 func splitWhois(response string) (string, string) {
-	responses1 := (strings.Split(response, "\n"))
 
-	if len(responses1) < LINE_OWNER {
-		return "", ""
+	var owner, country string
+
+	ownerline := (strings.Split(response, "OrgName:"))
+	countryline := (strings.Split(response, "Country:"))
+
+	if len(ownerline) > 1 {
+		ownersplit := (strings.Split(ownerline[1], "\n"))
+		owner = strings.Trim(ownersplit[0], " ")
 	}
 
-	lineOwner := responses1[LINE_OWNER]
-	lineCountry := responses1[LINE_COUNTRY]
-
-	owner := strings.Split(lineOwner, ":")
-	country := strings.Split(lineCountry, ":")
-
-	if len(owner) < 2 || len(country) < 2 {
-		return "", ""
+	if len(countryline) > 1 {
+		countrysplit := (strings.Split(countryline[1], "\n"))
+		country = strings.Trim(countrysplit[0], " ")
 	}
 
-	serverOwner := strings.Trim(owner[1], " ")
-	serverCountry := strings.Trim(country[1], " ")
+	return owner, country
 
-	return serverOwner, serverCountry
+	/*
+		responses1 := (strings.Split(response, "\n"))
+
+		if len(responses1) < LINE_OWNER {
+			return "", ""
+		}
+
+		lineOwner := responses1[LINE_OWNER]
+		lineCountry := responses1[LINE_COUNTRY]
+
+		owner := strings.Split(lineOwner, ":")
+		country := strings.Split(lineCountry, ":")
+
+		if len(owner) < 2 || len(country) < 2 {
+			return "", ""
+		}
+
+		serverOwner := strings.Trim(owner[1], " ")
+		serverCountry := strings.Trim(country[1], " ")
+
+		return serverOwner, serverCountry
+	*/
 }
 
 /*
@@ -87,8 +104,10 @@ func GenerateSSLGrade(servers []ServerApi) string {
 		grade := grades[0]
 
 		if existsInSSL(grade) {
-			if grade >= minor {
-				minor = grade
+			if grade != SSL_DEFAULT {
+				if grade >= minor {
+					minor = grade
+				}
 			}
 		}
 	}
